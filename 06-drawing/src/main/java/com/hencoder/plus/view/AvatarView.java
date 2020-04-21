@@ -22,6 +22,7 @@ public class AvatarView extends View {
     private static final float EDGE_WIDTH = Utils.dp2px(10);
 
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    //后画的是src
     Xfermode xfermode = new PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
     Bitmap bitmap;
     RectF savedArea = new RectF();
@@ -45,11 +46,14 @@ public class AvatarView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        //这里主要会加个黑框
+        paint.setColor(getResources().getColor(android.R.color.holo_green_dark));
         canvas.drawOval(PADDING, PADDING, PADDING + WIDTH, PADDING + WIDTH, paint);
         int saved = canvas.saveLayer(savedArea, paint);
+        paint.setColor(getResources().getColor(android.R.color.holo_red_dark));
         canvas.drawOval(PADDING + EDGE_WIDTH, PADDING + EDGE_WIDTH, PADDING + WIDTH - EDGE_WIDTH, PADDING + WIDTH - EDGE_WIDTH, paint);
         paint.setXfermode(xfermode);
-        canvas.drawBitmap(bitmap, PADDING, PADDING, paint);
+        // canvas.drawBitmap(bitmap, PADDING, PADDING, paint);
         paint.setXfermode(null);
         canvas.restoreToCount(saved);
     }

@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.hencoder.plus.Utils;
@@ -42,8 +43,14 @@ public class PieChart extends View {
             paint.setColor(colors[i]);
             canvas.save();
             if (i == PULLED_OUT_INDEX) {
-                canvas.translate((float) Math.cos(Math.toRadians(currentAngle + angles[i] / 2)) * LENGTH,
-                        (float) Math.sin(Math.toRadians(currentAngle + angles[i] / 2)) * LENGTH);
+                //相当于求绿色那个角的坐标
+                float tranx =
+                        (float) Math.cos(Math.toRadians(currentAngle + angles[i] / 2)) * LENGTH;
+                float tranY =
+                        (float) Math.sin(Math.toRadians(currentAngle + angles[i] / 2)) * LENGTH;
+                Log.e("TAG", "PieChart onDraw tranx:" +tranx+" tranY="+tranY);
+                canvas.translate(tranx,
+                        tranY);
             }
             canvas.drawArc(bounds, currentAngle, angles[i], true, paint);
             canvas.restore();

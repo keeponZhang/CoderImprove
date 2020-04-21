@@ -8,6 +8,7 @@ import android.graphics.PathDashPathEffect;
 import android.graphics.PathMeasure;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.hencoder.plus.Utils;
@@ -46,6 +47,8 @@ public class Dashboard extends View {
         canvas.drawArc(getWidth() / 2 - RADIUS, getHeight() / 2 - RADIUS, getWidth() / 2 + RADIUS , getHeight() / 2 + RADIUS, 90 + ANGLE / 2, 360 - ANGLE, false, paint);
         paint.setPathEffect(null);
 
+        double v = getAngleFromMark(5);
+        Log.e("TAG", "Dashboard onDraw v:"+v );
         // 画指针
         canvas.drawLine(getWidth() / 2, getHeight() / 2,
                 (float) Math.cos(Math.toRadians(getAngleFromMark(5))) * LENGTH + getWidth() / 2,
