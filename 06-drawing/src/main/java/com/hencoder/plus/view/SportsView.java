@@ -55,7 +55,8 @@ public class SportsView extends View {
         paint.setTextSize(Utils.dp2px(70));
         // paint.setStyle(Paint.Style.FILL);
         // paint.setTextAlign(Paint.Align.CENTER);
-//        paint.getTextBounds("abab", 0, "abab".length(), rect);
+       paint.getTextBounds("blog", 0, "blog".length(), rect);
+        Log.e("TAG", "SportsView onDraw:" + rect.top + "  rect.bottom=" + rect.bottom);
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
 
@@ -63,6 +64,7 @@ public class SportsView extends View {
         paint.setTextSize(160);
         Paint.FontMetricsInt fm  = paint.getFontMetricsInt();
 
+        //这个是负数，所以需要用centerY -offset
         float offset = (fm.ascent + fm.descent) / 2;
         Log.e("TAG", "SportsView onDraw:"+fm.ascent+" fm.descent="+fm.descent );
         float baseline0 = centerY -offset;
