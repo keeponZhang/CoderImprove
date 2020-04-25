@@ -22,6 +22,7 @@ public class Utils {
     }
 
     public static float getZForCamera() {
+        //越小越丑，区分正负
         return - 6 * Resources.getSystem().getDisplayMetrics().density;
     }
 }

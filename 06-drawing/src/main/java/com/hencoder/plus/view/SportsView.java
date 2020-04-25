@@ -55,9 +55,14 @@ public class SportsView extends View {
         paint.setTextSize(Utils.dp2px(70));
         // paint.setStyle(Paint.Style.FILL);
         // paint.setTextAlign(Paint.Align.CENTER);
-//        paint.getTextBounds("abab", 0, "abab".length(), rect);
+       paint.getTextBounds("blog", 0, "blog".length(), rect);
+
         int centerX = getWidth() / 2;
         int centerY = getHeight() / 2;
+        int offset2 =  (rect.top + rect.bottom)/2;
+        Log.e("TAG", "SportsView onDraw offset2:" +offset2);
+        //这里为甚要减，因为现在是偏上
+        int i = centerY - offset2;
 
         Paint paint = new Paint();
         paint.setTextSize(160);
@@ -77,6 +82,7 @@ public class SportsView extends View {
 
         // canvas.drawLine(centerX, centerY, centerX + RADIUS, centerY , linPaint);
         // linPaint.setColor(Color.parseColor("#0000ff"));
+        canvas.drawLine(centerX, i, centerX + RADIUS, i , paint);
         canvas.drawLine(centerX, centerY, centerX + RADIUS, centerY , paint);
         canvas.drawLine(centerX, baseline, centerX + RADIUS, baseline , paint);
         canvas.drawLine(centerX, fm.bottom+baseline, centerX + RADIUS,
@@ -92,7 +98,7 @@ public class SportsView extends View {
         canvas.drawLine(centerX, fm.ascent+baseline, centerX + RADIUS,
                 fm.ascent+baseline ,
                 paint);
-        canvas.drawText("blog", centerX, baseline , paint);
+        canvas.drawText("blog", centerX, centerY-offset2 , paint);
         // paint.setColor(Color.parseColor("#ff0000"));
         // canvas.drawText("blog", centerX, baseline0 , paint);
 

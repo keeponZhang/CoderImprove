@@ -6,6 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.hencoder.a07_change_camera_animation.view.DaoView
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
     <com.hencoder.a07_change_camera_animation.view.CameraView
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
