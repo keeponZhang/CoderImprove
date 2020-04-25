@@ -27,10 +27,13 @@ public class TagLayout extends ViewGroup {
         int specWidth = MeasureSpec.getSize(widthMeasureSpec);
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
+            //这里widthUsed之所以可以传0，因为我们这里会自动计算换行，但是heightUsed时没传0的
             measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, heightUsed);
+            //这里检测换行
             if (specMode != MeasureSpec.UNSPECIFIED &&
                     lineWidthUsed + child.getMeasuredWidth() > specWidth) {
                 lineWidthUsed = 0;
+                //换行前的累计高度，新的一行没算进去，所以后面需要 height = heightUsed + lineMaxHeight;
                 heightUsed += lineMaxHeight;
                 lineMaxHeight = 0;
                 measureChildWithMargins(child, widthMeasureSpec, 0, heightMeasureSpec, heightUsed);
@@ -44,6 +47,7 @@ public class TagLayout extends ViewGroup {
             }
             childBound.set(lineWidthUsed, heightUsed, lineWidthUsed + child.getMeasuredWidth(), heightUsed + child.getMeasuredHeight());
             lineWidthUsed += child.getMeasuredWidth();
+            //对比是每行的
             widthUsed = Math.max(widthUsed, lineWidthUsed);
             lineMaxHeight = Math.max(lineMaxHeight, child.getMeasuredHeight());
         }

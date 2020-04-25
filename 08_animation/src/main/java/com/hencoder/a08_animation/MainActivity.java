@@ -18,13 +18,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         view = findViewById(R.id.view);
-       /* view.animate()
+        view.animate()
                 .translationX(Utils.dpToPixel(200))
                 .translationY(100)
                 .rotation(180)
                 .alpha(0.5f)
                 .setStartDelay(1000)
-                .start();*/
+                .start();
 
         /*ObjectAnimator animator = ObjectAnimator.ofFloat(view, "radius", Utils.dpToPixel(150));
         animator.setStartDelay(1000);

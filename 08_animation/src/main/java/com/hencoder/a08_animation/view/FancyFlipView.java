@@ -78,6 +78,7 @@ public class FancyFlipView extends View {
         canvas.save();
         canvas.translate(PADDING + IMAGE_WIDTH / 2, PADDING + IMAGE_WIDTH / 2);
         canvas.rotate(-flipRotation);
+        //这个是针对camera旋转
         camera.save();
         camera.rotateX(bottomFlip);
         camera.applyToCanvas(canvas);

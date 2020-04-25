@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import androidx.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import com.hencoder.a10_layout.Utils;
@@ -24,9 +25,15 @@ public class CircleView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = (PADDING + RADIUS) * 2;
         int height = (PADDING + RADIUS) * 2;
+        int size = MeasureSpec.getSize(widthMeasureSpec);
+        int heightsize = MeasureSpec.getSize(heightMeasureSpec);
+        Log.w("TAG",
+                "CircleView onMeasure size:" +size+"  heightsize="+heightsize+" "+Utils.dpToPixel(200));
 
+        //resolveSize
         width = resolveSizeAndState(width, widthMeasureSpec, 0);
-        height = resolveSizeAndState(height, widthMeasureSpec, 0);
+        height = resolveSizeAndState(height, heightMeasureSpec, 0);
+        Log.e("TAG", "CircleView onMeasure width:" +width+"  height="+height);
         setMeasuredDimension(width, height);
     }
 

@@ -10,6 +10,7 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 
 public class MaterialEditText extends androidx.appcompat.widget.AppCompatEditText {
     private static final String TAG = MaterialEditText.class.getSimpleName();
@@ -105,6 +106,9 @@ public class MaterialEditText extends androidx.appcompat.widget.AppCompatEditTex
 
         paint.setAlpha((int) (0xff * floatingLabelFraction));
         float extraOffset = TEXT_ANIMATION_OFFSET * (1 - floatingLabelFraction);
+        Log.e("TAG", "MaterialEditText onDraw floatingLabelFraction:"+floatingLabelFraction+" " +
+                "extraOffset="+extraOffset );
+
         canvas.drawText(getHint().toString(), TEXT_HORIZONTAL_OFFSET, TEXT_VERTICAL_OFFSET + extraOffset, paint);
     }
 }
