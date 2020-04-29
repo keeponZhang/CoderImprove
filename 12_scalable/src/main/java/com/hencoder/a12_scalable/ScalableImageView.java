@@ -17,7 +17,7 @@ import androidx.core.view.GestureDetectorCompat;
 
 public class ScalableImageView extends View {
     private static final float IMAGE_WIDTH = Utils.dpToPixel(300);
-    private static final float OVER_SCALE_FACTOR = 1.5f;
+    private static final float OVER_SCALE_FACTOR = 1.f;
 
     Bitmap bitmap;
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -54,7 +54,10 @@ public class ScalableImageView extends View {
         originalOffsetX = ((float) getWidth() - bitmap.getWidth()) / 2;
         originalOffsetY = ((float) getHeight() - bitmap.getHeight()) / 2;
 
+        //图片的宽高比与屏幕的宽高比（像本张图片1>0.7）
         if ((float) bitmap.getWidth() / bitmap.getHeight() > (float) getWidth() / getHeight()) {
+            //smallScale 宽度贴边，OVER_SCALE_FACTOR =1时bigScale是高度贴边
+            //走进这里，说明宽度放大到与屏幕宽度比较快
             smallScale = (float) getWidth() / bitmap.getWidth();
             bigScale = (float) getHeight() / bitmap.getHeight() * OVER_SCALE_FACTOR;
         } else {
@@ -80,7 +83,7 @@ public class ScalableImageView extends View {
 
         float scaleFraction = (currentScale - smallScale) / (bigScale - smallScale);
         canvas.translate(offsetX * scaleFraction, offsetY * scaleFraction);
-        canvas.scale(currentScale, currentScale, getWidth() / 2f, getHeight() / 2f);
+        canvas.scale(bigScale, bigScale, getWidth() / 2f, getHeight() / 2f);
         canvas.drawBitmap(bitmap, originalOffsetX, originalOffsetY, paint);
     }
 
