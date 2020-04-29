@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -17,7 +18,7 @@ import androidx.core.view.GestureDetectorCompat;
 
 public class ScalableImageView extends View {
     private static final float IMAGE_WIDTH = Utils.dpToPixel(300);
-    private static final float OVER_SCALE_FACTOR = 1.f;
+    private static final float OVER_SCALE_FACTOR = 1.3f;
 
     Bitmap bitmap;
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -83,7 +84,7 @@ public class ScalableImageView extends View {
 
         float scaleFraction = (currentScale - smallScale) / (bigScale - smallScale);
         canvas.translate(offsetX * scaleFraction, offsetY * scaleFraction);
-        canvas.scale(bigScale, bigScale, getWidth() / 2f, getHeight() / 2f);
+        canvas.scale(currentScale, currentScale, getWidth() / 2f, getHeight() / 2f);
         canvas.drawBitmap(bitmap, originalOffsetX, originalOffsetY, paint);
     }
 
@@ -121,12 +122,15 @@ public class ScalableImageView extends View {
             return false;
         }
 
+        //上一个点到当前 旧位置减新位置
         @Override
         public boolean onScroll(MotionEvent down, MotionEvent event, float distanceX, float distanceY) {
+            Log.e("TAG", "HenGestureListener onScroll big:"+big );
             if (big) {
                 offsetX -= distanceX;
                 offsetY -= distanceY;
                 fixOffsets();
+                Log.e("TAG", "HenGestureListener onScroll:" );
                 invalidate();
             }
             return false;
@@ -158,6 +162,7 @@ public class ScalableImageView extends View {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
+            //只在这里改变big，有bug
             big = !big;
             if (big) {
                 offsetX = (e.getX() - getWidth() / 2f) - (e.getX() - getWidth() / 2) * bigScale / smallScale;
@@ -178,6 +183,8 @@ public class ScalableImageView extends View {
 
     private void fixOffsets() {
         offsetX = Math.min(offsetX, (bitmap.getWidth() * bigScale - getWidth()) / 2);
+        //很小的时候，要往大了拉，向左（手指向右）offsetX>0
+        Log.e("TAG", "ScalableImageView fixOffsets offsetX:"+offsetX );
         offsetX = Math.max(offsetX, - (bitmap.getWidth() * bigScale - getWidth()) / 2);
         offsetY = Math.min(offsetY, (bitmap.getHeight() * bigScale - getHeight()) / 2);
         offsetY = Math.max(offsetY, - (bitmap.getHeight() * bigScale - getHeight()) / 2);
@@ -191,6 +198,7 @@ public class ScalableImageView extends View {
                 offsetX = scroller.getCurrX();
                 offsetY = scroller.getCurrY();
                 invalidate();
+                //这里重新又调用了
                 postOnAnimation(this);
             }
         }
