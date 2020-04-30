@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -32,23 +33,31 @@ public class MultiTouchView1 extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getActionMasked()) {
+        switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 trackingPointerId = event.getPointerId(0);
+                Log.w("TAG", "onTouchEvent ACTION_DOWN:");
+                //需要记下初始值
                 downX = event.getX();
                 downY = event.getY();
                 originalOffsetX = offsetX;
                 originalOffsetY = offsetY;
                 break;
             case MotionEvent.ACTION_MOVE:
+                //根据id拿index
                 int index = event.findPointerIndex(trackingPointerId);
+                //初始偏移和手机移动导致的偏移
                 offsetX = originalOffsetX + event.getX(index) - downX;
                 offsetY = originalOffsetY + event.getY(index) - downY;
+                Log.e("TAG", "MultiTouchView1 onTouchEvent ACTION_MOVE offsetX:"+offsetX+" " +
+                        "offsetY="+offsetY);
                 invalidate();
                 break;
             case MotionEvent.ACTION_POINTER_DOWN:
                 int actionIndex = event.getActionIndex();
                 trackingPointerId = event.getPointerId(actionIndex);
+                Log.d("TAG", "MultiTouchView1 onTouchEvent ACTION_POINTER_DOWN " +
+                        "trackingPointerId:"+trackingPointerId);
                 downX = event.getX(actionIndex);
                 downY = event.getY(actionIndex);
                 originalOffsetX = offsetX;
@@ -57,8 +66,14 @@ public class MultiTouchView1 extends View {
             case MotionEvent.ACTION_POINTER_UP:
                 actionIndex = event.getActionIndex();
                 int pointerId = event.getPointerId(actionIndex);
+                Log.e("TAG", "MultiTouchView1 onTouchEvent pointerId:"+pointerId+"  " +
+                        "trackingPointerId="+trackingPointerId);
+                //活跃的抬起了
                 if (pointerId == trackingPointerId) {
+                    Log.w("TAG", "MultiTouchView1 onTouchEvent pointerId == trackingPointerId " +
+                            "actionIndex:"+actionIndex);
                     int newIndex;
+                    //如果抬起是最大的
                     if (actionIndex == event.getPointerCount() - 1) {
                         newIndex = event.getPointerCount() - 2;
                     } else {

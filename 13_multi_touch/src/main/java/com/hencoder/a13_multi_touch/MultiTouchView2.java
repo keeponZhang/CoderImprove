@@ -36,7 +36,9 @@ public class MultiTouchView2 extends View {
         float sumY = 0;
         int pointerCount = event.getPointerCount();
         boolean isPointerUp = event.getActionMasked() == MotionEvent.ACTION_POINTER_UP;
+        //抬起一瞬间是ACTION_POINTER_UP事件，但是那个点还没消失，记下的依然是两个焦点，但是下一个Move是一个焦点来算的
         for (int i = 0; i < pointerCount; i++) {
+            //并且是抬起的那个手指（抬起的不一定是最后一个手指）
             if (!(isPointerUp && i == event.getActionIndex())) {
                 sumX += event.getX(i);
                 sumY += event.getY(i);

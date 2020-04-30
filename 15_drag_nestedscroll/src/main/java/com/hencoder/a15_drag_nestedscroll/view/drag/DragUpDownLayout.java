@@ -2,6 +2,7 @@ package com.hencoder.a15_drag_nestedscroll.view.drag;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -64,7 +65,9 @@ public class DragUpDownLayout extends FrameLayout {
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
+            Log.e("TAG", "DragListener onViewReleased:");
             if (Math.abs(yvel) > viewConfiguration.getScaledMinimumFlingVelocity()) {
+                //满足fling，向下
                 if (yvel > 0) {
                     dragHelper.settleCapturedViewAt(0, getHeight() - releasedChild.getHeight());
                 } else {

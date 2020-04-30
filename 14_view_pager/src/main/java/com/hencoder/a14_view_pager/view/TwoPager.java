@@ -2,6 +2,7 @@ package com.hencoder.a14_view_pager.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
@@ -57,6 +58,7 @@ public class TwoPager extends ViewGroup {
         }
         velocityTracker.addMovement(ev);
 
+        Log.e("TAG", "TwoPager onInterceptTouchEvent:");
         boolean result = false;
         switch (ev.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
@@ -66,6 +68,7 @@ public class TwoPager extends ViewGroup {
                 downScrollX = getScrollX();
                 break;
             case MotionEvent.ACTION_MOVE:
+                Log.w("TAG", "TwoPager onInterceptTouchEvent:");
                 float dx = downX - ev.getX();
                 if (!scrolling) {
                     if (Math.abs(dx) > viewConfiguration.getScaledPagingTouchSlop()) {
@@ -81,6 +84,7 @@ public class TwoPager extends ViewGroup {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        Log.e("TAG", "TwoPager onTouchEvent:");
         if (event.getActionMasked() == MotionEvent.ACTION_DOWN) {
             velocityTracker.clear();
         }
@@ -93,12 +97,16 @@ public class TwoPager extends ViewGroup {
                 downScrollX = getScrollX();
                 break;
             case MotionEvent.ACTION_MOVE:
+                //依然是上一个点减去当前的点(手指向左，其实向右移动，dx>0),所以这里可以直接加downScrollX
                 float dx = downX - event.getX() + downScrollX;
+                Log.e("TAG",
+                        "TwoPager onTouchEvent dx:"+dx+"  (downX - event.getX())"+(downX - event.getX()));
                 if (dx > getWidth()) {
                     dx = getWidth();
                 } else if (dx < 0) {
                     dx = 0;
                 }
+                //子view比父View大适用,正值是往左，dx（scrollx）是子view左上角为原点，然后父view离子view左上角的值
                 scrollTo((int) (dx), 0);
                 break;
             case MotionEvent.ACTION_UP:
@@ -109,6 +117,7 @@ public class TwoPager extends ViewGroup {
                 if (Math.abs(vx) < minVelocity) {
                     targetPage = scrollX > getWidth() / 2 ? 1 : 0;
                 } else {
+                    //速度大看速度朝向
                     targetPage = vx < 0 ? 1 : 0;
                 }
                 int scrollDistance = targetPage == 1 ? (getWidth() - scrollX) : - scrollX;
@@ -116,6 +125,7 @@ public class TwoPager extends ViewGroup {
                 postInvalidateOnAnimation();
                 break;
         }
+        //这里表示消费
         return true;
     }
 
@@ -125,5 +135,18 @@ public class TwoPager extends ViewGroup {
             scrollTo(overScroller.getCurrX(), overScroller.getCurrY());
             postInvalidateOnAnimation();
         }
+    }
+    public  String getActioString(MotionEvent event){
+        int action = event.getAction();
+        if(action ==MotionEvent.ACTION_DOWN){
+            return "ACTION_DOWN";
+        } else if(action ==MotionEvent.ACTION_MOVE){
+            return "ACTION_MOVE";
+        }else if(action ==MotionEvent.ACTION_UP){
+            return "ACTION_UP";
+        }else if(action ==MotionEvent.ACTION_CANCEL){
+            return "ACTION_CANCEL";
+        }
+        return "";
     }
 }

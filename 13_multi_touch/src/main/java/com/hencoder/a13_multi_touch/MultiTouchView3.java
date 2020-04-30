@@ -17,6 +17,7 @@ import static android.view.MotionEvent.ACTION_POINTER_DOWN;
 import static android.view.MotionEvent.ACTION_POINTER_UP;
 import static android.view.MotionEvent.ACTION_UP;
 
+//互不干扰，画板
 public class MultiTouchView3 extends View {
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
@@ -53,7 +54,7 @@ public class MultiTouchView3 extends View {
                 }
                 invalidate();
                 break;
-            case ACTION_UP:
+            // case ACTION_UP:
             case ACTION_POINTER_UP:
                 pointerId = event.getPointerId(event.getActionIndex());
                 paths.remove(pointerId);

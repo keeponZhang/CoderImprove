@@ -16,9 +16,10 @@ import android.widget.OverScroller;
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
 
-public class ScalableImageView extends View {
+//这个存在问题，放大后移动，再缩小，会有便宜，因为放大移动，offsetX变了（解决方案是偏移跟缩放挂钩）
+public class ScalableImageView2 extends View {
     private static final float IMAGE_WIDTH = Utils.dpToPixel(300);
-    private static final float OVER_SCALE_FACTOR = 1.3f;
+    private static final float OVER_SCALE_FACTOR = 1.f;
 
     Bitmap bitmap;
     Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -35,17 +36,14 @@ public class ScalableImageView extends View {
     GestureDetectorCompat detector;
     HenGestureListener gestureListener = new HenGestureListener();
     HenFlingRunner henFlingRunner = new HenFlingRunner();
-    ScaleGestureDetector scaleDetector;
-    HenScaleListener henScaleListener = new HenScaleListener();
     OverScroller scroller;
+    private float mScaleFraction;
 
-    public ScalableImageView(Context context, @Nullable AttributeSet attrs) {
+    public ScalableImageView2(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-
         bitmap = Utils.getAvatar(getResources(), (int) IMAGE_WIDTH);
         detector = new GestureDetectorCompat(context, gestureListener);
         scroller = new OverScroller(context);
-        scaleDetector = new ScaleGestureDetector(context, henScaleListener);
     }
 
     @Override
@@ -65,46 +63,47 @@ public class ScalableImageView extends View {
             smallScale = (float) getHeight() / bitmap.getHeight();
             bigScale = (float) getWidth() / bitmap.getWidth() * OVER_SCALE_FACTOR;
         }
-        //这里需要赋值
-        currentScale = smallScale;
+        // currentScale = smallScale;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        boolean result = scaleDetector.onTouchEvent(event);
-        if (!scaleDetector.isInProgress()) {
-            result = detector.onTouchEvent(event);
-        }
-
-        return result;
+        return detector.onTouchEvent(event);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        Log.e("TAG", "ScalableImageView onDraw currentScale:"+currentScale);
-        float scaleFraction = (currentScale - smallScale) / (bigScale - smallScale);
-        canvas.translate(offsetX * scaleFraction, offsetY * scaleFraction);
-        canvas.scale(currentScale, currentScale, getWidth() / 2f, getHeight() / 2f);
+        Log.e("TAG", "ScalableImageView2 onDraw offsetX:" + offsetX + "  offsetY=" + offsetY + " " +
+                " mScaleFraction=" + mScaleFraction);
+        //放大缩小重复但是不移动，offsetX为0（这个主要是为移动用的）
+        // canvas.translate(offsetX , offsetY );
+        //这个也是有问题的，缩到最小，offsetX不为0
+        canvas.translate(offsetX * mScaleFraction, offsetY * mScaleFraction);
+        if (mScaleFraction == 0) {
+            offsetX = 0;
+            offsetY = 0;
+        }
+        //这个其实直接用animator的监听器做也可以
+        float scale = smallScale + (bigScale - smallScale) * mScaleFraction;
+        canvas.scale(scale, scale, getWidth() / 2f, getHeight() / 2f);
         canvas.drawBitmap(bitmap, originalOffsetX, originalOffsetY, paint);
     }
 
-    private float getCurrentScale() {
-        return currentScale;
+    private float getScaleFraction() {
+        return mScaleFraction;
     }
 
-    private void setCurrentScale(float currentScale) {
-        this.currentScale = currentScale;
+    private void setScaleFraction(float scaleFraction) {
+        this.mScaleFraction = scaleFraction;
         invalidate();
     }
 
     private ObjectAnimator getScaleAnimator() {
         if (scaleAnimator == null) {
-            scaleAnimator = ObjectAnimator.ofFloat(this, "currentScale", 0);
+            scaleAnimator = ObjectAnimator.ofFloat(this, "scaleFraction", 0, 1);
         }
-        //这里要注意
-        scaleAnimator.setFloatValues(smallScale, bigScale);
         return scaleAnimator;
     }
 
@@ -125,15 +124,13 @@ public class ScalableImageView extends View {
             return false;
         }
 
-        //上一个点到当前 旧位置减新位置
         @Override
-        public boolean onScroll(MotionEvent down, MotionEvent event, float distanceX, float distanceY) {
-            Log.e("TAG", "HenGestureListener onScroll big:"+big );
+        public boolean onScroll(MotionEvent down, MotionEvent event, float distanceX,
+                                float distanceY) {
             if (big) {
                 offsetX -= distanceX;
                 offsetY -= distanceY;
                 fixOffsets();
-                Log.e("TAG", "HenGestureListener onScroll:" );
                 invalidate();
             }
             return false;
@@ -145,12 +142,13 @@ public class ScalableImageView extends View {
         }
 
         @Override
-        public boolean onFling(MotionEvent down, MotionEvent event, float velocityX, float velocityY) {
+        public boolean onFling(MotionEvent down, MotionEvent event, float velocityX,
+                               float velocityY) {
             if (big) {
                 scroller.fling((int) offsetX, (int) offsetY, (int) velocityX, (int) velocityY,
-                        - (int) (bitmap.getWidth() * bigScale - getWidth()) / 2,
+                        -(int) (bitmap.getWidth() * bigScale - getWidth()) / 2,
                         (int) (bitmap.getWidth() * bigScale - getWidth()) / 2,
-                        - (int) (bitmap.getHeight() * bigScale - getHeight()) / 2,
+                        -(int) (bitmap.getHeight() * bigScale - getHeight()) / 2,
                         (int) (bitmap.getHeight() * bigScale - getHeight()) / 2);
 
                 postOnAnimation(henFlingRunner);
@@ -165,13 +163,8 @@ public class ScalableImageView extends View {
 
         @Override
         public boolean onDoubleTap(MotionEvent e) {
-            //只在这里改变big，有bug
             big = !big;
             if (big) {
-                //逆向偏移
-                offsetX = (e.getX() - getWidth() / 2f) - (e.getX() - getWidth() / 2) * bigScale / smallScale;
-                offsetY = (e.getY() - getHeight() / 2f) - (e.getY() - getHeight() / 2) * bigScale / smallScale;
-                fixOffsets();
                 getScaleAnimator().start();
             } else {
                 getScaleAnimator().reverse();
@@ -187,11 +180,9 @@ public class ScalableImageView extends View {
 
     private void fixOffsets() {
         offsetX = Math.min(offsetX, (bitmap.getWidth() * bigScale - getWidth()) / 2);
-        //很小的时候，要往大了拉，向左（手指向右）offsetX>0
-        Log.e("TAG", "ScalableImageView fixOffsets offsetX:"+offsetX );
-        offsetX = Math.max(offsetX, - (bitmap.getWidth() * bigScale - getWidth()) / 2);
+        offsetX = Math.max(offsetX, -(bitmap.getWidth() * bigScale - getWidth()) / 2);
         offsetY = Math.min(offsetY, (bitmap.getHeight() * bigScale - getHeight()) / 2);
-        offsetY = Math.max(offsetY, - (bitmap.getHeight() * bigScale - getHeight()) / 2);
+        offsetY = Math.max(offsetY, -(bitmap.getHeight() * bigScale - getHeight()) / 2);
     }
 
     class HenFlingRunner implements Runnable {
@@ -202,32 +193,10 @@ public class ScalableImageView extends View {
                 offsetX = scroller.getCurrX();
                 offsetY = scroller.getCurrY();
                 invalidate();
-                //这里重新又调用了
                 postOnAnimation(this);
             }
         }
     }
 
-    class HenScaleListener implements ScaleGestureDetector.OnScaleGestureListener {
-        float initialScale;
 
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            //用scale更好算
-            currentScale = initialScale * detector.getScaleFactor();
-            invalidate();
-            return false;
-        }
-
-        @Override
-        public boolean onScaleBegin(ScaleGestureDetector detector) {
-            initialScale = currentScale;
-            return true;
-        }
-
-        @Override
-        public void onScaleEnd(ScaleGestureDetector detector) {
-
-        }
-    }
 }

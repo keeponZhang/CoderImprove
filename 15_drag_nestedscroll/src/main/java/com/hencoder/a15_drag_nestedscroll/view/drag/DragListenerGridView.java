@@ -68,6 +68,7 @@ public class DragListenerGridView extends ViewGroup {
             childLeft = index % 2 * childWidth;
             childTop = index / 2 * childHeight;
             child.layout(0, 0, childWidth, childHeight);
+            //都摆左上角，做便宜
             child.setTranslationX(childLeft);
             child.setTranslationY(childTop);
         }

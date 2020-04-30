@@ -125,11 +125,13 @@ public class ScalableImageView extends View implements NestedScrollingChild2 {
         return childHelper.hasNestedScrollingParent(type);
     }
 
+    //第二次询问，子view消费了一部分，已消费的部分dxConsumed，未消费的部分dxUnconsumed
     @Override
     public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, @Nullable int[] offsetInWindow, int type) {
         return childHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow, type);
     }
 
+    //第一次询问，父view消费可以往consumed赋值
     @Override
     public boolean dispatchNestedPreScroll(int dx, int dy, @Nullable int[] consumed, @Nullable int[] offsetInWindow, int type) {
         return childHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type);

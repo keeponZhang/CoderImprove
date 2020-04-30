@@ -49,6 +49,7 @@ public class DragHelperGridView extends ViewGroup {
         }
     }
 
+    //需要重新这两个方法
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return dragHelper.shouldInterceptTouchEvent(ev);
@@ -98,7 +99,8 @@ public class DragHelperGridView extends ViewGroup {
 
         @Override
         public void onViewCaptured(@NonNull View capturedChild, int activePointerId) {
-            capturedChild.setElevation(getElevation() + 1);
+            //这个是做初始化的，setElevation可以是高度变高，看着是在上层
+            capturedChild.setElevation(getElevation() + 10);
             capturedLeft = capturedChild.getLeft();
             capturedTop = capturedChild.getTop();
         }
@@ -109,8 +111,8 @@ public class DragHelperGridView extends ViewGroup {
 
         @Override
         public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
-            dragHelper.settleCapturedViewAt((int) capturedLeft, (int) capturedTop);
-            postInvalidateOnAnimation();
+            // dragHelper.settleCapturedViewAt((int) capturedLeft, (int) capturedTop);
+            // postInvalidateOnAnimation();
         }
     }
 }
