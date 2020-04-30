@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -128,12 +129,14 @@ public class ScalableImageView extends View implements NestedScrollingChild2 {
     //第二次询问，子view消费了一部分，已消费的部分dxConsumed，未消费的部分dxUnconsumed
     @Override
     public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed, int dyUnconsumed, @Nullable int[] offsetInWindow, int type) {
+        Log.e("TAG", "ScalableImageView dispatchNestedScroll:");
         return childHelper.dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, offsetInWindow, type);
     }
 
     //第一次询问，父view消费可以往consumed赋值
     @Override
     public boolean dispatchNestedPreScroll(int dx, int dy, @Nullable int[] consumed, @Nullable int[] offsetInWindow, int type) {
+        Log.e("TAG", "ScalableImageView dispatchNestedPreScroll:");
         return childHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow, type);
     }
 
@@ -161,6 +164,8 @@ public class ScalableImageView extends View implements NestedScrollingChild2 {
                 offsetY -= distanceY;
                 int unconsumed = fixOffsets();
                 if (unconsumed != 0) {
+                    //这里是子view调用
+                    Log.w("TAG", "HenGestureListener onScroll:");
                     childHelper.dispatchNestedScroll(0, 0, 0, unconsumed, null);
                 } else {
                     invalidate();
